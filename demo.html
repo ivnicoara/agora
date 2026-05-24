@@ -595,22 +595,22 @@
     const delegates = [
       { handle: "@elena.s",    topic: "Tech & digital rights",  weight: "Delegating Justice", trust: 94, color: "bg-purple-500",
         position: "Public money = public code. Treat state software like the public service it is.",
-        followers: 12340, totalVotes: 184, activity: [3,5,2,7,6,4,5],
+        followers: 12340, totalVotes: 184, activity: [3,5,2,7,6,4,5], votingPower: 8421,
         scope: ['Justice'], notify: true,
         votes: { 1: 1 } },
       { handle: "@dr.popescu", topic: "Healthcare",             weight: "Delegating Healthcare, Infrastructure",  trust: 88, color: "bg-rose-500",
         position: "Evidence over ideology. If a policy doesn't show outcomes in year 1, kill it.",
-        followers: 8910, totalVotes: 142, activity: [2,3,4,2,5,3,2],
+        followers: 8910, totalVotes: 142, activity: [2,3,4,2,5,3,2], votingPower: 5147,
         scope: ['Healthcare', 'Infrastructure'], notify: false,
         votes: { 2: 1 } },
       { handle: "@dan.r",      topic: "Climate & environment",  weight: "Delegating Climate",  trust: 91, color: "bg-emerald-500",
         position: "Boring climate policy beats heroic climate policy. Audits, sunset clauses, native species.",
-        followers: 5670, totalVotes: 98, activity: [1,2,1,3,2,4,3],
+        followers: 5670, totalVotes: 98, activity: [1,2,1,3,2,4,3], votingPower: 3208,
         scope: ['Climate'], notify: false,
         votes: { 4: 1 } },
       { handle: "@ioana.p",    topic: "Anti-corruption",        weight: "Delegating Justice, Economy", trust: 97, color: "bg-amber-500",
         position: "Every euro of public money deserves a paper trail. Sunlight, not investigations.",
-        followers: 21400, totalVotes: 312, activity: [6,8,4,7,9,5,7],
+        followers: 21400, totalVotes: 312, activity: [6,8,4,7,9,5,7], votingPower: 14782,
         scope: ['Justice', 'Economy'], notify: true,
         votes: { 3: 1, 5: 1 } },
     ];
@@ -618,22 +618,22 @@
     const suggestedDelegates = [
       { handle: "@maria.v",    topic: "Education reform",       trust: 89, color: "bg-blue-500",
         position: "Schools are not battlegrounds for adult politics. Fund what works, ditch what doesn't.",
-        followers: 7820, totalVotes: 76, activity: [2,3,2,4,3,2,3] },
+        followers: 7820, totalVotes: 76, activity: [2,3,2,4,3,2,3], votingPower: 4912 },
       { handle: "@stefan.l",   topic: "Housing & urban policy", trust: 86, color: "bg-orange-500",
         position: "Housing is infrastructure. Build dense, build cheap, build now.",
-        followers: 4310, totalVotes: 64, activity: [1,2,3,2,1,2,2] },
+        followers: 4310, totalVotes: 64, activity: [1,2,3,2,1,2,2], votingPower: 2186 },
       { handle: "@rares.c",    topic: "Economy & jobs",         trust: 92, color: "bg-cyan-500",
         position: "Small business carries half the country. Stop pretending otherwise in the tax code.",
-        followers: 15200, totalVotes: 201, activity: [4,5,3,6,4,5,4] },
+        followers: 15200, totalVotes: 201, activity: [4,5,3,6,4,5,4], votingPower: 9658 },
       { handle: "@lucia.h",    topic: "Justice & law",          trust: 95, color: "bg-indigo-500",
         position: "Speedy justice or no justice. Three years for a verdict is a denial of rights.",
-        followers: 18900, totalVotes: 267, activity: [5,7,4,6,8,5,6] },
+        followers: 18900, totalVotes: 267, activity: [5,7,4,6,8,5,6], votingPower: 11342 },
       { handle: "@vlad.m",     topic: "Energy & utilities",     trust: 83, color: "bg-teal-500",
         position: "Cheap reliable energy is a precondition for everything else. Pick the engineering, not the slogan.",
-        followers: 3100, totalVotes: 48, activity: [1,1,2,1,2,1,1] },
+        followers: 3100, totalVotes: 48, activity: [1,1,2,1,2,1,1], votingPower: 1517 },
       { handle: "@ana.f",      topic: "Foreign affairs",        trust: 87, color: "bg-pink-500",
         position: "Alliances over isolation. Long-term trust compounds — short-term posturing destroys it.",
-        followers: 6240, totalVotes: 89, activity: [2,2,1,3,2,2,2] },
+        followers: 6240, totalVotes: 89, activity: [2,2,1,3,2,2,2], votingPower: 3891 },
     ];
 
     const policyAreas = [
@@ -641,6 +641,18 @@
       "Education reform", "Economy & jobs", "Infrastructure", "Defense & security",
       "Justice & law", "Housing & urban policy", "Energy & utilities", "Foreign affairs",
     ];
+
+    // Find which delegate (if any) currently covers a category, excluding one handle.
+    // Used to enforce one-delegate-per-category.
+    function getCategoryDelegate(category, excludeHandle) {
+      for (const d of delegates) {
+        if (d.handle === excludeHandle) continue;
+        const scope = d.scope || 'full';
+        if (scope === 'full') return d;
+        if (Array.isArray(scope) && scope.includes(category)) return d;
+      }
+      return null;
+    }
 
     // Find which delegate (if any) has voted on this proposal on the user's behalf.
     // Honors the delegate's scope: 'full' = all categories; array = specific categories only.
@@ -748,20 +760,24 @@
         if (dv) {
           const overridden = p.myVote !== 0 && p.myVote !== dv.dir;
           if (overridden) {
+            const remainingPower = Math.max(0, (dv.delegate.votingPower || 1) - 1);
             delegateChip = `
-              <div onclick="event.stopPropagation()" class="flex items-center gap-2 mb-3 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-xl text-sm">
+              <div onclick="event.stopPropagation()" class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-3 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-xl text-sm">
                 <span class="text-yellow-700">⚠</span>
-                <span class="text-ink/70">You overrode <span class="font-semibold text-ink">${dv.delegate.handle}</span>'s ${dv.dir === 1 ? '▲ support' : '▼ oppose'} vote</span>
+                <span class="text-ink/70">You took back your <strong>1 vote</strong> from <span class="font-semibold text-ink">${dv.delegate.handle}</span></span>
+                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 bg-yellow-200/60 rounded-full text-[11px] font-bold">⚡ ${remainingPower.toLocaleString()} remaining</span>
                 <button onclick="event.stopPropagation(); restoreDelegate(${p.id})" class="ml-auto text-xs font-bold text-yellow-800 hover:underline">↺ Restore</button>
               </div>
             `;
           } else if (p.myVote === 0) {
             delegateChip = `
-              <div onclick="event.stopPropagation()" class="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 border border-blue-100 rounded-xl text-sm">
+              <div onclick="event.stopPropagation()" class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-3 px-3 py-2 bg-blue-50 border border-blue-100 rounded-xl text-sm">
                 <span class="w-6 h-6 rounded-full ${dv.delegate.color} grid place-items-center text-white text-[10px] font-bold flex-shrink-0">${dv.delegate.handle.charAt(1).toUpperCase()}</span>
-                <span class="text-ink/70"><span class="font-semibold text-ink">${dv.delegate.handle}</span> voted on your behalf</span>
-                <span class="font-bold ${dv.dir === 1 ? 'text-green-700' : 'text-red-700'}">${dv.dir === 1 ? '▲ Support' : '▼ Oppose'}</span>
-                <span class="ml-auto text-[10px] uppercase tracking-wider text-blue-600 font-bold">delegated</span>
+                <span class="font-semibold text-ink">${dv.delegate.handle}</span>
+                <span class="font-bold ${dv.dir === 1 ? 'text-green-700' : 'text-red-700'}">${dv.dir === 1 ? '▲ Supported' : '▼ Opposed'}</span>
+                <span class="text-ink/60">— wielding</span>
+                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 bg-yellow-200/60 rounded-full text-[11px] font-bold whitespace-nowrap">⚡ ${(dv.delegate.votingPower || 1).toLocaleString()} votes</span>
+                <span class="ml-auto text-[10px] uppercase tracking-wider text-blue-600 font-bold">incl. you</span>
               </div>
             `;
           }
@@ -1013,12 +1029,27 @@
               </div>
             </div>
 
-            <p class="text-sm text-ink/70 italic leading-snug mb-4 pl-1 border-l-2 border-ink/10 ml-1">"${d.position}"</p>
+            <p class="text-sm text-ink/70 italic leading-snug mb-3 pl-1 border-l-2 border-ink/10 ml-1">"${d.position}"</p>
+
+            <!-- voting power banner -->
+            <div class="flex items-center justify-between gap-3 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-xl mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-yellow-600 text-lg leading-none">⚡</span>
+                <div>
+                  <div class="text-xl font-black tabular-nums leading-none">${(d.votingPower || 0).toLocaleString()}</div>
+                  <div class="text-[10px] uppercase tracking-widest text-ink/50 font-bold mt-0.5">voting power</div>
+                </div>
+              </div>
+              <div class="text-right text-[10px] text-ink/60 leading-snug">
+                <div>${fmt((d.votingPower || 0) - 1)} delegations</div>
+                <div class="font-semibold text-emerald-700">+ you</div>
+              </div>
+            </div>
 
             <!-- mini stats row -->
             <div class="flex items-center justify-between gap-3 text-xs text-ink/60 mb-4 pb-4 border-b border-ink/5">
               <div class="flex items-center gap-1.5"><span>👥</span> <span class="font-semibold text-ink">${fmt(d.followers)}</span> followers</div>
-              <div class="flex items-center gap-1.5"><span>🗳</span> <span class="font-semibold text-ink">${d.totalVotes}</span> total votes</div>
+              <div class="flex items-center gap-1.5"><span>🗳</span> <span class="font-semibold text-ink">${d.totalVotes}</span> votes</div>
               <div class="flex items-center gap-1.5" title="Last 7 days">${sparkline(d.activity)}</div>
             </div>
 
@@ -1032,7 +1063,10 @@
             </button>
             <div class="grid grid-cols-3 gap-2">
               <button onclick="openDelegateSettings('${d.handle}', false)" class="px-2 py-2 rounded-full font-semibold text-xs border border-ink/10 hover:border-ink/40 hover:bg-ink/5 transition">⚙ Scope</button>
-              <button onclick="messageDelegate('${d.handle}')" class="px-2 py-2 rounded-full font-semibold text-xs border border-ink/10 hover:border-ink/40 hover:bg-ink/5 transition">✉ Message</button>
+              <button onclick="messageDelegate('${d.handle}')" class="px-2 py-2 rounded-full font-semibold text-xs border border-ink/10 hover:border-ink/40 hover:bg-ink/5 transition flex items-center justify-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+                Message
+              </button>
               <button onclick="revoke('${d.handle}')" class="px-2 py-2 rounded-full font-semibold text-xs bg-red-50 text-red-700 hover:bg-red-100 transition">Revoke</button>
             </div>
             <div id="delegate-votes-${slug}" class="hidden mt-4 pt-4 border-t border-ink/10 space-y-2">
@@ -1078,12 +1112,16 @@
             </div>
           </div>
           <p class="text-xs text-ink/70 italic leading-snug mb-3 line-clamp-2">"${d.position}"</p>
+          <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 bg-yellow-50 border border-yellow-200 rounded-lg mb-2">
+            <span class="text-xs font-bold flex items-center gap-1"><span class="text-yellow-600">⚡</span> <span class="tabular-nums">${(d.votingPower || 0).toLocaleString()}</span></span>
+            <span class="text-[10px] uppercase tracking-widest text-ink/50 font-bold">voting power</span>
+          </div>
           <div class="flex items-center justify-between gap-2 text-[11px] text-ink/60 mb-3">
             <span>👥 ${fmt(d.followers)}</span>
             <span>🗳 ${d.totalVotes} votes</span>
             <span>${sparkline(d.activity)}</span>
           </div>
-          <button onclick="follow('${d.handle}')" class="w-full px-3 py-2 rounded-full font-semibold text-xs bg-ink text-paper hover:bg-yellow-400 hover:text-ink transition">+ Follow as delegate</button>
+          <button onclick="follow('${d.handle}')" class="w-full px-3 py-2 rounded-full font-semibold text-xs bg-ink text-paper hover:bg-yellow-400 hover:text-ink transition">+ Delegate (⚡ becomes ${((d.votingPower || 0) + 1).toLocaleString()})</button>
         </div>
       `).join('');
     }
@@ -1121,14 +1159,32 @@
       // Update card visuals
       updateScopeCardVisuals(isFull ? 'full' : 'specific');
 
-      // Build category checkboxes
+      // Build category checkboxes (annotate categories already covered by another delegate)
       const selected = Array.isArray(scope) ? scope : [];
-      document.getElementById('ds-checkboxes').innerHTML = VOTE_CATEGORIES.map(c => `
-        <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-ink/5 cursor-pointer text-sm">
-          <input type="checkbox" data-cat="${c}" class="w-4 h-4 accent-ink" ${selected.includes(c) ? 'checked' : ''}>
-          ${c}
-        </label>
-      `).join('');
+      document.getElementById('ds-checkboxes').innerHTML = VOTE_CATEGORIES.map(c => {
+        const other = getCategoryDelegate(c, d.handle);
+        const hint = other
+          ? `<span class="text-[10px] text-yellow-700 font-medium block">via ${other.handle}</span>`
+          : '';
+        return `
+          <label class="flex items-start gap-2 p-2 rounded-lg hover:bg-ink/5 cursor-pointer text-sm">
+            <input type="checkbox" data-cat="${c}" class="w-4 h-4 accent-ink mt-0.5 flex-shrink-0" ${selected.includes(c) ? 'checked' : ''}>
+            <span class="flex-1 min-w-0">${c}${hint}</span>
+          </label>
+        `;
+      }).join('');
+
+      // Live preview note for "Full delegation" if other delegates exist
+      const others = delegates.filter(x => x.handle !== d.handle);
+      const fullCard = document.querySelector('[data-scope-card="full"]');
+      const existingNote = fullCard.querySelector('.ds-full-note');
+      if (existingNote) existingNote.remove();
+      if (others.length > 0) {
+        const note = document.createElement('div');
+        note.className = 'ds-full-note text-[10px] text-yellow-700 font-medium mt-1';
+        note.textContent = `⚠ Will take over from ${others.map(x => x.handle).join(', ')}`;
+        fullCard.querySelector('div').appendChild(note);
+      }
 
       document.getElementById('ds-categories').classList.toggle('hidden', isFull);
       document.getElementById('ds-notify').checked = !!d.notify;
@@ -1154,34 +1210,73 @@
       }
     });
 
+    function weightStr(scope) {
+      if (scope === 'full') return 'Delegating all topics';
+      if (!Array.isArray(scope) || scope.length === 0) return 'No active delegation';
+      return `Delegating ${scope.join(', ')}`;
+    }
+
     function saveDelegateSettings() {
       if (!_ds.delegate) return;
       const isFull = document.querySelector('input[name="ds-scope"][value="full"]').checked;
       const cats = Array.from(document.querySelectorAll('#ds-checkboxes input:checked')).map(c => c.dataset.cat);
       if (!isFull && cats.length === 0) { toast('⚠ Pick at least one category'); return; }
-      const scope = isFull ? 'full' : cats;
-      const notify = document.getElementById('ds-notify').checked;
-      const weight = isFull ? 'Delegating all topics' : `Delegating ${cats.join(', ')}`;
+      const newScope = isFull ? 'full' : cats;
 
-      _ds.delegate.scope = scope;
-      _ds.delegate.notify = notify;
-      _ds.delegate.weight = weight;
+      // Enforce one-delegate-per-category: take overlapping categories away from others
+      const takenFrom = {}; // handle -> [categories]
+      delegates.forEach(other => {
+        if (other.handle === _ds.delegate.handle) return;
+        const os = other.scope || 'full';
+        if (newScope === 'full') {
+          // Full delegation takes everything from everyone
+          const lost = os === 'full' ? VOTE_CATEGORIES.slice() : (Array.isArray(os) ? os.slice() : []);
+          if (lost.length > 0) { takenFrom[other.handle] = lost; other.scope = []; other.weight = weightStr([]); }
+        } else if (Array.isArray(newScope)) {
+          if (os === 'full') {
+            // Other had full → split: they keep everything except what we're taking
+            const remaining = VOTE_CATEGORIES.filter(c => !newScope.includes(c));
+            takenFrom[other.handle] = newScope.slice();
+            other.scope = remaining;
+            other.weight = weightStr(remaining);
+          } else if (Array.isArray(os)) {
+            const overlap = os.filter(c => newScope.includes(c));
+            if (overlap.length > 0) {
+              takenFrom[other.handle] = overlap;
+              other.scope = os.filter(c => !newScope.includes(c));
+              other.weight = weightStr(other.scope);
+            }
+          }
+        }
+      });
+
+      _ds.delegate.scope = newScope;
+      _ds.delegate.notify = document.getElementById('ds-notify').checked;
+      _ds.delegate.weight = weightStr(newScope);
 
       if (_ds.isFollow) {
         const i = suggestedDelegates.findIndex(x => x.handle === _ds.delegate.handle);
         if (i >= 0) {
           const d = suggestedDelegates.splice(i, 1)[0];
           d.votes = d.votes || {};
+          d.votingPower = (d.votingPower || 0) + 1; // your delegation adds +1
           delegates.push(d);
           xp += 5;
           xpEl.textContent = `${xp} XP`;
           xpEl.classList.add('pop');
           setTimeout(() => xpEl.classList.remove('pop'), 300);
-          toast(`✓ Now delegating to ${d.handle} · +5 XP`);
+          toast(`✓ Now delegating to ${d.handle} · +5 XP · ⚡ ${fmt(d.votingPower)} power`);
         }
       } else {
         toast(`✓ Settings updated for ${_ds.delegate.handle}`);
       }
+
+      // Inform about takeovers
+      Object.entries(takenFrom).forEach(([handle, lost]) => {
+        const summary = lost.length > 3 ? `${lost.slice(0, 3).join(', ')} +${lost.length - 3}` : lost.join(', ');
+        toast(`↻ Took ${summary} from ${handle}`);
+      });
+
       closeDelegateSettings();
       renderProposals();
       renderDelegates();
@@ -1209,12 +1304,15 @@
       const i = delegates.findIndex(d => d.handle === handle);
       if (i < 0) return;
       const d = delegates.splice(i, 1)[0];
-      // move back to suggestions
+      d.votingPower = Math.max(0, (d.votingPower || 0) - 1); // your withdrawal removes -1
       delete d.weight;
       delete d.votes;
+      delete d.scope;
+      delete d.notify;
       suggestedDelegates.unshift(d);
-      toast(`✗ Delegate ${handle} revoked · recorded on-chain`);
+      toast(`✗ Revoked ${handle} · ⚡ ${fmt(d.votingPower)} power remaining`);
       renderDelegates();
+      renderProposals();
     }
 
     // ============ BUBBLE FLOW MAP (D3) ============
@@ -1570,6 +1668,35 @@
         `;
       }
 
+      // Delegated blocs that voted on this proposal
+      const delegatesOnProposal = delegates.filter(d => d.votes && d.votes[p.id] !== undefined);
+      const blocsBlock = delegatesOnProposal.length > 0 ? `
+        <div class="bg-white border border-ink/10 rounded-2xl p-5 mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-semibold uppercase tracking-widest text-ink/50">⚡ Delegated blocs voting on this</div>
+            <div class="text-xs text-ink/50 tabular-nums">${delegatesOnProposal.reduce((a, d) => a + (d.votingPower || 0), 0).toLocaleString()} votes channeled</div>
+          </div>
+          <div class="space-y-2">
+            ${delegatesOnProposal.map(d => {
+              const dir = d.votes[p.id];
+              return `
+                <div class="flex items-center gap-3 p-2.5 bg-paper rounded-xl hover:bg-ink/5 transition">
+                  <div onclick="openProfile('${d.handle}')" class="w-9 h-9 rounded-full ${d.color} grid place-items-center text-white text-sm font-bold flex-shrink-0 cursor-pointer hover:opacity-90">${d.handle.charAt(1).toUpperCase()}</div>
+                  <div class="flex-1 min-w-0">
+                    <div onclick="openProfile('${d.handle}')" class="font-bold text-sm hover:underline cursor-pointer">${d.handle}</div>
+                    <div class="text-xs text-ink/60 truncate">${d.topic}</div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <div class="font-bold text-sm ${dir === 1 ? 'text-green-700' : 'text-red-700'}">${dir === 1 ? '▲ Support' : '▼ Oppose'}</div>
+                    <div class="text-[11px] text-ink/60 font-semibold flex items-center gap-0.5 justify-end mt-0.5"><span class="text-yellow-600">⚡</span><span class="tabular-nums">${(d.votingPower || 1).toLocaleString()}</span> votes</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : '';
+
       const related = proposals.filter(x => x.id !== p.id && x.category === p.category).slice(0, 2).map(r => `
         <button onclick="openProposal(${r.id})" class="text-left bg-white border border-ink/10 rounded-xl p-4 hover:border-ink/30 hover:shadow transition w-full">
           <div class="text-xs text-ink/50 mb-1">${r.category} · @${r.author}</div>
@@ -1605,6 +1732,8 @@
             <button onclick="vote(${p.id}, -1); openProposal(${p.id})" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm border-2 transition ${p.myVote === -1 ? 'bg-red-500 text-white border-red-500' : 'border-ink/10 hover:border-red-500 hover:text-red-600'}">▼ Oppose</button>
           </div>
         </div>
+
+        ${blocsBlock}
 
         <!-- Arguments -->
         <div class="grid md:grid-cols-2 gap-4 mb-8">
@@ -1712,12 +1841,26 @@
       const actionBtn = user.isDelegate
         ? `<button onclick="revoke('${h}'); closeProfile()" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm bg-red-50 text-red-700 hover:bg-red-100 transition">Revoke delegate</button>`
         : user.isSuggested
-        ? `<button onclick="follow('${h}'); openProfile('${h}')" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm bg-ink text-paper hover:bg-yellow-400 hover:text-ink transition">+ Follow as delegate</button>`
+        ? `<button onclick="follow('${h}'); openProfile('${h}')" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm bg-ink text-paper hover:bg-yellow-400 hover:text-ink transition">+ Delegate to ${h}</button>`
         : `<button onclick="toast('⚐ Now following ${h}')" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm bg-ink text-paper hover:bg-yellow-400 hover:text-ink transition">⚐ Follow</button>`;
 
       const thirdStat = user.trust
         ? `<div><div class="text-2xl font-black text-emerald-600">${user.trust}<span class="text-sm">%</span></div><div class="text-[10px] text-ink/50 uppercase tracking-widest font-semibold mt-1">alignment</div></div>`
         : `<div><div class="text-2xl font-black">${userPosts.length}</div><div class="text-[10px] text-ink/50 uppercase tracking-widest font-semibold mt-1">proposals</div></div>`;
+
+      const powerBlock = (user.votingPower !== undefined) ? `
+        <div class="flex items-center gap-3 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-xl mb-5">
+          <span class="text-yellow-600 text-2xl leading-none flex-shrink-0">⚡</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 flex-wrap">
+              <div class="text-3xl font-black tabular-nums leading-none">${(user.votingPower || 0).toLocaleString()}</div>
+              ${user.isDelegate
+                ? '<span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full whitespace-nowrap">✓ incl. you</span>'
+                : ''}
+            </div>
+            <div class="text-[10px] uppercase tracking-widest text-ink/50 font-bold mt-1.5">voting power · delegated to ${h}</div>
+          </div>
+        </div>` : '';
 
       document.getElementById('profile-content').innerHTML = `
         <!-- Header -->
@@ -1731,6 +1874,7 @@
             </div>
           </div>
           <p class="text-ink/80 italic mb-5 leading-snug pl-3 border-l-2 border-ink/10">"${user.position}"</p>
+          ${powerBlock}
           <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-5 pt-4 border-t border-ink/5">
             <div><div class="text-2xl font-black tabular-nums">${fmt(user.followers)}</div><div class="text-[10px] text-ink/50 uppercase tracking-widest font-semibold mt-1">followers</div></div>
             <div><div class="text-2xl font-black tabular-nums">${user.totalVotes}</div><div class="text-[10px] text-ink/50 uppercase tracking-widest font-semibold mt-1">votes cast</div></div>
@@ -1738,7 +1882,10 @@
           </div>
           <div class="flex gap-2">
             ${actionBtn}
-            <button onclick="messageDelegate('${h}')" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm border-2 border-ink/10 hover:border-ink/40 transition">✉ Message</button>
+            <button onclick="messageDelegate('${h}')" class="flex-1 px-4 py-2.5 rounded-full font-semibold text-sm border-2 border-ink/10 hover:border-ink/40 transition flex items-center justify-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+              Message
+            </button>
           </div>
         </div>
 
