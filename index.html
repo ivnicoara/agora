@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agora — Direct Democracy Platform</title>
+  <meta name="description" content="A platform to revolutionize democracy. Direct voting, delegated representatives, transparent spending, blockchain-secured." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <meta name="theme-color" content="#0a0a0f">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            ink: '#0a0a0f',
+            paper: '#f7f5ef',
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f5ef; color: #0a0a0f; }
+    .grain {
+      background-image: radial-gradient(rgba(10,10,15,0.04) 1px, transparent 1px);
+      background-size: 3px 3px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #0a0a0f 0%, #4a4a8f 50%, #c9a227 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(10,10,15,0.15); }
+    .btn-primary {
+      background: #0a0a0f; color: #f7f5ef;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover { background: #c9a227; color: #0a0a0f; transform: translateY(-2px); }
+    .marquee { animation: scroll 30s linear infinite; }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body class="grain">
+
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-paper/80 border-b border-ink/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+      <a href="#" class="flex items-baseline gap-1.5 font-black text-lg sm:text-xl tracking-tight flex-shrink-0">
+        <span class="gradient-text italic font-black text-3xl sm:text-4xl leading-none" style="font-family: Georgia, 'Times New Roman', serif;">ἀ</span>
+        Agora
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="#how" class="hover:text-ink/60 transition" data-i18n="nav.how">How it works</a>
+        <a href="#features" class="hover:text-ink/60 transition" data-i18n="nav.features">Features</a>
+        <a href="#why" class="hover:text-ink/60 transition" data-i18n="nav.why">Why now</a>
+        <a href="#manifesto" class="hover:text-ink/60 transition" data-i18n="nav.manifesto">Manifesto</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Language selector -->
+        <div class="relative">
+          <button id="lang-btn" type="button" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-sm font-semibold hover:bg-ink/5 transition border border-ink/10">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span id="lang-current">EN</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div id="lang-menu" class="hidden absolute right-0 top-full mt-2 bg-white border border-ink/10 rounded-2xl shadow-xl overflow-hidden min-w-[180px] z-50">
+            <button data-lang="en" class="lang-opt w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-ink/5 flex items-center gap-3"><span>🇬🇧</span> English</button>
+            <button data-lang="de" class="lang-opt w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-ink/5 flex items-center gap-3"><span>🇩🇪</span> Deutsch</button>
+            <button data-lang="fr" class="lang-opt w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-ink/5 flex items-center gap-3"><span>🇫🇷</span> Français</button>
+            <button data-lang="es" class="lang-opt w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-ink/5 flex items-center gap-3"><span>🇪🇸</span> Español</button>
+            <button data-lang="it" class="lang-opt w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-ink/5 flex items-center gap-3"><span>🇮🇹</span> Italiano</button>
+            <button data-lang="ro" class="lang-opt w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-ink/5 flex items-center gap-3"><span>🇷🇴</span> Română</button>
+          </div>
+        </div>
+        <a href="demo.html" class="btn-primary px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <span data-i18n="nav.demo">Launch demo</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="pt-40 pb-24 px-6 relative overflow-hidden">
+    <!-- floating shapes -->
+    <div class="absolute top-32 right-10 w-72 h-72 bg-yellow-400/20 rounded-full blur-3xl animate-pulse-slow"></div>
+    <div class="absolute bottom-0 left-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
+
+    <div class="max-w-7xl mx-auto relative">
+      <div class="flex items-center gap-2 mb-6 sm:mb-8 text-[11px] sm:text-xs font-semibold tracking-widest uppercase text-ink/60">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+        <span data-i18n="hero.kicker">Open proposal · v0.1 prototype</span>
+      </div>
+
+      <h1 class="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.85] mb-6 sm:mb-8">
+        <span data-i18n="hero.h1">Democracy,</span><br>
+        <span class="gradient-text italic tracking-tight" style="font-family: Georgia, 'Times New Roman', serif;" data-i18n="hero.h2">rewritten</span><br>
+        <span data-i18n="hero.h3">by the people.</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl md:text-2xl text-ink/70 max-w-2xl mb-10 sm:mb-12 leading-relaxed" data-i18n="hero.sub">
+        A platform where every citizen is a politician. Propose, debate, vote — or delegate your voice to someone you trust. Backed by blockchain, free of parties.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+        <a href="demo.html" class="btn-primary px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-semibold flex items-center gap-2 sm:gap-3 group">
+          <span data-i18n="hero.cta1">Launch the demo</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#how" class="px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-semibold border-2 border-ink/15 hover:border-ink/40 transition flex items-center gap-2" data-i18n="hero.cta2">
+          See how it works
+        </a>
+      </div>
+
+      <!-- stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mt-16 sm:mt-24 pt-10 sm:pt-12 border-t border-ink/10">
+        <div>
+          <div class="text-3xl sm:text-4xl font-black tracking-tight">0%</div>
+          <div class="text-xs sm:text-sm text-ink/60 mt-1" data-i18n="stat.parties">Political parties needed</div>
+        </div>
+        <div>
+          <div class="text-3xl sm:text-4xl font-black tracking-tight">100%</div>
+          <div class="text-xs sm:text-sm text-ink/60 mt-1" data-i18n="stat.transparency">Spending transparency</div>
+        </div>
+        <div>
+          <div class="text-3xl sm:text-4xl font-black tracking-tight"><span data-i18n="stat.one">1 vote</span></div>
+          <div class="text-xs sm:text-sm text-ink/60 mt-1" data-i18n="stat.vote">Per citizen, per decision</div>
+        </div>
+        <div>
+          <div class="text-3xl sm:text-4xl font-black tracking-tight">∞</div>
+          <div class="text-xs sm:text-sm text-ink/60 mt-1" data-i18n="stat.change">Times you can change your mind</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY AGORA -->
+  <section id="name" class="px-6 py-24 border-t border-ink/10">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-[auto_1fr] gap-12 md:gap-16 items-center">
+      <div class="text-center md:text-left">
+        <div class="text-xs font-semibold tracking-widest uppercase text-ink/50 mb-3">The name</div>
+        <div class="text-8xl md:text-9xl font-black tracking-tighter leading-none gradient-text">ἀγορά</div>
+        <div class="text-sm text-ink/50 mt-3 font-mono tracking-wide">agorá · Ancient Greek</div>
+      </div>
+      <div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-5 leading-tight" data-i18n="name.headline">The central public square — where democracy was invented.</h2>
+        <p class="text-lg text-ink/70 leading-relaxed mb-4">
+          In Athens around the 5th century BCE, the <em>agora</em> was the open-air gathering place where every citizen could speak, debate proposals, and vote on civic matters in person. It is the literal birthplace of direct democracy.
+        </p>
+        <p class="text-lg text-ink/70 leading-relaxed">
+          Political power lived in the open — not behind closed doors, not routed through representatives. This platform is the digital revival of that square: same idea, modern infrastructure.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="px-6 py-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-end justify-between mb-16 flex-wrap gap-6">
+        <div>
+          <div class="text-xs font-semibold tracking-widest uppercase text-ink/50 mb-3">How it works</div>
+          <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight max-w-2xl" data-i18n="how.headline">A feed that runs a country.</h2>
+        </div>
+        <p class="text-base sm:text-lg text-ink/60 max-w-md" data-i18n="how.sub">Familiar formats — Reddit-style threads, TikTok-style videos — repurposed for governance.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- step 1 -->
+        <div class="bg-white rounded-3xl p-8 card-hover border border-ink/5">
+          <div class="text-7xl font-black text-ink/10 mb-2">01</div>
+          <h3 class="text-2xl font-bold mb-3 tracking-tight">Propose anything</h3>
+          <p class="text-ink/60 leading-relaxed">Any citizen posts an initiative — a law, a budget shift, a local fix. Threaded debate, upvotes, real arguments. The best ideas surface naturally.</p>
+        </div>
+        <!-- step 2 -->
+        <div class="bg-white rounded-3xl p-8 card-hover border border-ink/5">
+          <div class="text-7xl font-black text-ink/10 mb-2">02</div>
+          <h3 class="text-2xl font-bold mb-3 tracking-tight">Vote directly, or delegate</h3>
+          <p class="text-ink/60 leading-relaxed">Vote yourself on issues you care about. Pass your vote to a delegate you trust on the rest. Withdraw it the second they disappoint you.</p>
+        </div>
+        <!-- step 3 -->
+        <div class="bg-white rounded-3xl p-8 card-hover border border-ink/5">
+          <div class="text-7xl font-black text-ink/10 mb-2">03</div>
+          <h3 class="text-2xl font-bold mb-3 tracking-tight">Learn before you vote</h3>
+          <p class="text-ink/60 leading-relaxed">A short civics course unlocks direct voting. Until then, your vote flows to a delegate. No barrier to participation — just to misinformed power.</p>
+        </div>
+        <!-- step 4 -->
+        <div class="bg-white rounded-3xl p-8 card-hover border border-ink/5">
+          <div class="text-7xl font-black text-ink/10 mb-2">04</div>
+          <h3 class="text-2xl font-bold mb-3 tracking-tight">Watch every cent</h3>
+          <p class="text-ink/60 leading-relaxed">An interactive map shows how public funds flow — from treasury to street. Spot waste. Propose a fix. Vote it through.</p>
+        </div>
+        <!-- step 5 -->
+        <div class="bg-white rounded-3xl p-8 card-hover border border-ink/5">
+          <div class="text-7xl font-black text-ink/10 mb-2">05</div>
+          <h3 class="text-2xl font-bold mb-3 tracking-tight">Sealed by blockchain</h3>
+          <p class="text-ink/60 leading-relaxed">Every vote, every euro, every delegation — recorded on-chain. Tamper-proof, auditable by anyone, forever.</p>
+        </div>
+        <!-- step 6 -->
+        <div class="bg-yellow-400 rounded-3xl p-8 card-hover relative overflow-hidden">
+          <div class="text-7xl font-black text-ink/15 mb-2">06</div>
+          <h3 class="text-2xl font-bold mb-3 tracking-tight">Made to feel good</h3>
+          <p class="text-ink/70 leading-relaxed">Streaks, badges, civic XP. Participation is rewarded — symbolically, never financially — so showing up becomes habit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SPLIT -->
+  <section id="features" class="px-6 py-24 bg-ink text-paper">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-xs font-semibold tracking-widest uppercase text-yellow-300 mb-4">Features</div>
+      <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-16 sm:mb-20 max-w-3xl" data-i18n="features.headline">The whole apparatus of representative democracy — compressed into an app.</h2>
+
+      <div class="grid md:grid-cols-2 gap-x-16 gap-y-16">
+        <div class="flex gap-5">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400 text-ink grid place-items-center font-black">↑</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Liquid democracy</h3>
+            <p class="text-paper/60 leading-relaxed">Vote yourself, or delegate per-topic to someone smarter on housing, climate, healthcare. Revoke anytime.</p>
+          </div>
+        </div>
+        <div class="flex gap-5">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400 text-ink grid place-items-center font-black">▶</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Short-form policy</h3>
+            <p class="text-paper/60 leading-relaxed">A TikTok-style vertical feed where representatives pitch policy in 60 seconds. Civic content that doesn't feel like homework.</p>
+          </div>
+        </div>
+        <div class="flex gap-5">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400 text-ink grid place-items-center font-black">⌬</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">On-chain audit trail</h3>
+            <p class="text-paper/60 leading-relaxed">Every action is a transaction. Anyone can verify, anyone can audit. Trust without taking anyone's word for it.</p>
+          </div>
+        </div>
+        <div class="flex gap-5">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400 text-ink grid place-items-center font-black">€</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Spending map</h3>
+            <p class="text-paper/60 leading-relaxed">A live, zoomable Sankey of the national budget. Click any branch, see who got paid, when, for what.</p>
+          </div>
+        </div>
+        <div class="flex gap-5">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400 text-ink grid place-items-center font-black">✎</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Civics gate</h3>
+            <p class="text-paper/60 leading-relaxed">A short, free course on how legislation actually works. Pass it once, vote forever. Anti-populism by design.</p>
+          </div>
+        </div>
+        <div class="flex gap-5">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400 text-ink grid place-items-center font-black">★</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">No parties</h3>
+            <p class="text-paper/60 leading-relaxed">Coalitions form around ideas, not brands. Delegates rise on merit and stay on accountability. The party machine becomes obsolete.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY NOW -->
+  <section id="why" class="px-6 py-24">
+    <div class="max-w-5xl mx-auto text-center">
+      <div class="text-xs font-semibold tracking-widest uppercase text-ink/50 mb-4">Why now</div>
+      <h2 class="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-8 sm:mb-10 leading-[0.95]">
+        <span data-i18n="why.h1">Trust in institutions is at a record low.</span><br>
+        <span class="text-ink/40" data-i18n="why.h2">So we rebuild the institutions.</span>
+      </h2>
+      <p class="text-xl text-ink/60 max-w-2xl mx-auto leading-relaxed">
+        The tools to do this exist today — smartphones in every pocket, blockchains that don't lie, recommendation algorithms that already shape what we believe. We've spent a decade letting those tools be used against citizens. It's time to point them the other way.
+      </p>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section id="manifesto" class="px-6 py-24 bg-yellow-400">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-xs font-semibold tracking-widest uppercase text-ink mb-6">Manifesto</div>
+      <div class="space-y-6 sm:space-y-8 text-xl sm:text-2xl md:text-4xl font-bold tracking-tight leading-tight">
+        <p data-i18n="manifesto.1">1. Every citizen is a politician.</p>
+        <p data-i18n="manifesto.2">2. Power borrowed must be returnable on demand.</p>
+        <p data-i18n="manifesto.3">3. Spending in the dark is theft from the public.</p>
+        <p data-i18n="manifesto.4">4. An informed vote is a free vote.</p>
+        <p data-i18n="manifesto.5">5. Parties are scaffolding. The building stands without them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="px-6 py-32 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-6 sm:mb-8 leading-[0.9]">
+        <span data-i18n="cta.h1">Want to</span> <span class="italic gradient-text tracking-tight" style="font-family: Georgia, 'Times New Roman', serif;" data-i18n="cta.h2">see it</span> <span data-i18n="cta.h3">running?</span>
+      </h2>
+      <p class="text-lg sm:text-xl text-ink/60 mb-10 sm:mb-12 max-w-xl mx-auto" data-i18n="cta.body">A working prototype — feed, voting, delegation, spending map. Click around. Vote on something.</p>
+      <a href="demo.html" class="btn-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full text-base sm:text-lg font-semibold inline-flex items-center gap-3 group">
+        <span data-i18n="cta.btn">Launch the demo</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-ink/10 px-6 py-10">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm text-ink/60">
+      <div class="flex items-center gap-2 font-bold text-ink">
+        <span class="inline-block w-6 h-6 bg-ink rounded-full grid place-items-center text-paper text-xs">A</span>
+        Agora
+      </div>
+      <div>An open proposal. Not affiliated with any party or government.</div>
+      <div>© 2026 · Built for the people</div>
+    </div>
+  </footer>
+
+  <script>
+    const I18N = {
+      en: {
+        'nav.how':'How it works','nav.features':'Features','nav.why':'Why now','nav.manifesto':'Manifesto','nav.demo':'Launch demo',
+        'hero.kicker':'Open proposal · v0.1 prototype','hero.h1':'Democracy,','hero.h2':'rewritten','hero.h3':'by the people.',
+        'hero.sub':'A platform where every citizen is a politician. Propose, debate, vote — or delegate your voice to someone you trust. Backed by blockchain, free of parties.',
+        'hero.cta1':'Launch the demo','hero.cta2':'See how it works',
+        'stat.parties':'Political parties needed','stat.transparency':'Spending transparency','stat.one':'1 vote','stat.vote':'Per citizen, per decision','stat.change':'Times you can change your mind',
+        'name.headline':'The central public square — where democracy was invented.',
+        'how.headline':'A feed that runs a country.','how.sub':'Familiar formats — Reddit-style threads, TikTok-style videos — repurposed for governance.',
+        'features.headline':'The whole apparatus of representative democracy — compressed into an app.',
+        'why.h1':'Trust in institutions is at a record low.','why.h2':'So we rebuild the institutions.',
+        'manifesto.1':'1. Every citizen is a politician.','manifesto.2':'2. Power borrowed must be returnable on demand.','manifesto.3':'3. Spending in the dark is theft from the public.','manifesto.4':'4. An informed vote is a free vote.','manifesto.5':'5. Parties are scaffolding. The building stands without them.',
+        'cta.h1':'Want to','cta.h2':'see it','cta.h3':'running?','cta.body':'A working prototype — feed, voting, delegation, spending map. Click around. Vote on something.','cta.btn':'Launch the demo',
+      },
+      de: {
+        'nav.how':'Funktionsweise','nav.features':'Funktionen','nav.why':'Warum jetzt','nav.manifesto':'Manifest','nav.demo':'Demo starten',
+        'hero.kicker':'Offener Vorschlag · v0.1 Prototyp','hero.h1':'Demokratie,','hero.h2':'neu geschrieben','hero.h3':'vom Volk.',
+        'hero.sub':'Eine Plattform, auf der jeder Bürger Politiker ist. Vorschlagen, debattieren, abstimmen — oder Ihre Stimme an jemanden delegieren, dem Sie vertrauen. Durch Blockchain gesichert, parteienfrei.',
+        'hero.cta1':'Demo starten','hero.cta2':'So funktioniert es',
+        'stat.parties':'Erforderliche Parteien','stat.transparency':'Ausgabentransparenz','stat.one':'1 Stimme','stat.vote':'Pro Bürger, pro Entscheidung','stat.change':'Mal können Sie Ihre Meinung ändern',
+        'name.headline':'Der zentrale öffentliche Platz — wo die Demokratie erfunden wurde.',
+        'how.headline':'Ein Feed, der ein Land regiert.','how.sub':'Vertraute Formate — Reddit-Threads, TikTok-Videos — für die Regierungsführung umgewidmet.',
+        'features.headline':'Der gesamte Apparat der repräsentativen Demokratie — komprimiert in einer App.',
+        'why.h1':'Das Vertrauen in Institutionen ist auf einem Rekordtief.','why.h2':'Also bauen wir die Institutionen neu.',
+        'manifesto.1':'1. Jeder Bürger ist ein Politiker.','manifesto.2':'2. Geliehene Macht muss auf Verlangen rückgebbar sein.','manifesto.3':'3. Ausgaben im Verborgenen sind Diebstahl an der Öffentlichkeit.','manifesto.4':'4. Eine informierte Stimme ist eine freie Stimme.','manifesto.5':'5. Parteien sind nur Gerüst. Das Gebäude steht ohne sie.',
+        'cta.h1':'Wollen Sie','cta.h2':'es sehen','cta.h3':'in Aktion?','cta.body':'Ein funktionierender Prototyp — Feed, Abstimmung, Delegation, Ausgabenkarte. Klicken Sie herum. Stimmen Sie ab.','cta.btn':'Demo starten',
+      },
+      fr: {
+        'nav.how':'Fonctionnement','nav.features':'Fonctionnalités','nav.why':'Pourquoi maintenant','nav.manifesto':'Manifeste','nav.demo':'Lancer la démo',
+        'hero.kicker':'Proposition ouverte · prototype v0.1','hero.h1':'La démocratie,','hero.h2':'réécrite','hero.h3':'par le peuple.',
+        'hero.sub':'Une plateforme où chaque citoyen est un politicien. Proposer, débattre, voter — ou déléguer votre voix à quelqu\'un en qui vous avez confiance. Sécurisée par blockchain, sans partis.',
+        'hero.cta1':'Lancer la démo','hero.cta2':'Voir comment ça marche',
+        'stat.parties':'Partis politiques nécessaires','stat.transparency':'Transparence des dépenses','stat.one':'1 vote','stat.vote':'Par citoyen, par décision','stat.change':'Fois où vous pouvez changer d\'avis',
+        'name.headline':'La place publique centrale — où la démocratie a été inventée.',
+        'how.headline':'Un fil d\'actualité qui dirige un pays.','how.sub':'Formats familiers — fils de discussion façon Reddit, vidéos façon TikTok — réutilisés pour gouverner.',
+        'features.headline':'Tout l\'appareil de la démocratie représentative — compressé dans une appli.',
+        'why.h1':'La confiance dans les institutions est au plus bas.','why.h2':'Alors nous reconstruisons les institutions.',
+        'manifesto.1':'1. Chaque citoyen est un politicien.','manifesto.2':'2. Le pouvoir prêté doit être restituable sur demande.','manifesto.3':'3. Dépenser dans l\'ombre, c\'est voler le public.','manifesto.4':'4. Un vote informé est un vote libre.','manifesto.5':'5. Les partis sont des échafaudages. L\'édifice tient sans eux.',
+        'cta.h1':'Envie de','cta.h2':'le voir','cta.h3':'en action ?','cta.body':'Un prototype fonctionnel — fil, vote, délégation, carte des dépenses. Cliquez. Votez sur quelque chose.','cta.btn':'Lancer la démo',
+      },
+      es: {
+        'nav.how':'Cómo funciona','nav.features':'Funciones','nav.why':'Por qué ahora','nav.manifesto':'Manifiesto','nav.demo':'Probar demo',
+        'hero.kicker':'Propuesta abierta · prototipo v0.1','hero.h1':'La democracia,','hero.h2':'reescrita','hero.h3':'por el pueblo.',
+        'hero.sub':'Una plataforma donde cada ciudadano es un político. Propón, debate, vota — o delega tu voz en alguien de tu confianza. Respaldada por blockchain, sin partidos.',
+        'hero.cta1':'Probar la demo','hero.cta2':'Ver cómo funciona',
+        'stat.parties':'Partidos políticos necesarios','stat.transparency':'Transparencia del gasto','stat.one':'1 voto','stat.vote':'Por ciudadano, por decisión','stat.change':'Veces que puedes cambiar de opinión',
+        'name.headline':'La plaza pública central — donde se inventó la democracia.',
+        'how.headline':'Un feed que gobierna un país.','how.sub':'Formatos familiares — hilos estilo Reddit, vídeos estilo TikTok — al servicio de la gobernanza.',
+        'features.headline':'Todo el aparato de la democracia representativa — comprimido en una app.',
+        'why.h1':'La confianza en las instituciones está en mínimos históricos.','why.h2':'Así que reconstruimos las instituciones.',
+        'manifesto.1':'1. Cada ciudadano es un político.','manifesto.2':'2. El poder prestado debe ser devolvible a demanda.','manifesto.3':'3. Gastar en la sombra es robar al público.','manifesto.4':'4. Un voto informado es un voto libre.','manifesto.5':'5. Los partidos son andamios. El edificio se sostiene sin ellos.',
+        'cta.h1':'¿Quieres','cta.h2':'verlo','cta.h3':'en marcha?','cta.body':'Un prototipo funcional — feed, votación, delegación, mapa de gasto. Haz clic. Vota algo.','cta.btn':'Probar la demo',
+      },
+      it: {
+        'nav.how':'Come funziona','nav.features':'Funzionalità','nav.why':'Perché ora','nav.manifesto':'Manifesto','nav.demo':'Avvia demo',
+        'hero.kicker':'Proposta aperta · prototipo v0.1','hero.h1':'La democrazia,','hero.h2':'riscritta','hero.h3':'dal popolo.',
+        'hero.sub':'Una piattaforma dove ogni cittadino è un politico. Proponi, dibatti, vota — o delega la tua voce a qualcuno di cui ti fidi. Garantita da blockchain, senza partiti.',
+        'hero.cta1':'Avvia la demo','hero.cta2':'Scopri come funziona',
+        'stat.parties':'Partiti politici necessari','stat.transparency':'Trasparenza della spesa','stat.one':'1 voto','stat.vote':'Per cittadino, per decisione','stat.change':'Volte in cui puoi cambiare idea',
+        'name.headline':'La piazza pubblica centrale — dove è nata la democrazia.',
+        'how.headline':'Un feed che governa un Paese.','how.sub':'Formati familiari — thread in stile Reddit, video in stile TikTok — al servizio della politica.',
+        'features.headline':'L\'intero apparato della democrazia rappresentativa — compresso in un\'app.',
+        'why.h1':'La fiducia nelle istituzioni è ai minimi storici.','why.h2':'Quindi ricostruiamo le istituzioni.',
+        'manifesto.1':'1. Ogni cittadino è un politico.','manifesto.2':'2. Il potere prestato deve essere restituibile a richiesta.','manifesto.3':'3. Spendere nell\'ombra è rubare al pubblico.','manifesto.4':'4. Un voto informato è un voto libero.','manifesto.5':'5. I partiti sono impalcature. L\'edificio sta in piedi senza di loro.',
+        'cta.h1':'Vuoi','cta.h2':'vederlo','cta.h3':'in azione?','cta.body':'Un prototipo funzionante — feed, voto, delega, mappa della spesa. Clicca. Vota qualcosa.','cta.btn':'Avvia la demo',
+      },
+      ro: {
+        'nav.how':'Cum funcționează','nav.features':'Funcții','nav.why':'De ce acum','nav.manifesto':'Manifest','nav.demo':'Pornește demo',
+        'hero.kicker':'Propunere deschisă · prototip v0.1','hero.h1':'Democrația,','hero.h2':'rescrisă','hero.h3':'de oameni.',
+        'hero.sub':'O platformă unde fiecare cetățean este politician. Propune, dezbate, votează — sau deleagă-ți vocea cuiva în care ai încredere. Securizată prin blockchain, fără partide.',
+        'hero.cta1':'Pornește demo-ul','hero.cta2':'Vezi cum funcționează',
+        'stat.parties':'Partide politice necesare','stat.transparency':'Transparența cheltuielilor','stat.one':'1 vot','stat.vote':'Per cetățean, per decizie','stat.change':'De câte ori te poți răzgândi',
+        'name.headline':'Piața publică centrală — unde a fost inventată democrația.',
+        'how.headline':'Un feed care conduce o țară.','how.sub':'Formate familiare — fire de discuție stil Reddit, video-uri stil TikTok — folosite pentru guvernare.',
+        'features.headline':'Întregul aparat al democrației reprezentative — comprimat într-o aplicație.',
+        'why.h1':'Încrederea în instituții e la cel mai jos nivel din istorie.','why.h2':'Așa că reconstruim instituțiile.',
+        'manifesto.1':'1. Fiecare cetățean este politician.','manifesto.2':'2. Puterea împrumutată trebuie să poată fi retrasă oricând.','manifesto.3':'3. Cheltuiala în întuneric e furt din banul public.','manifesto.4':'4. Un vot informat este un vot liber.','manifesto.5':'5. Partidele sunt schelă. Clădirea stă în picioare fără ele.',
+        'cta.h1':'Vrei să','cta.h2':'o vezi','cta.h3':'în acțiune?','cta.body':'Un prototip funcțional — feed, vot, delegare, harta cheltuielilor. Dă click. Votează ceva.','cta.btn':'Pornește demo-ul',
+      },
+    };
+
+    function applyLang(lang) {
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.dataset.i18n;
+        if (dict[k]) el.textContent = dict[k];
+      });
+      document.getElementById('lang-current').textContent = lang.toUpperCase();
+      document.documentElement.setAttribute('lang', lang);
+      try { localStorage.setItem('agora_lang', lang); } catch (e) {}
+    }
+
+    const langBtn = document.getElementById('lang-btn');
+    const langMenu = document.getElementById('lang-menu');
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      langMenu.classList.toggle('hidden');
+    });
+    document.querySelectorAll('.lang-opt').forEach(b => {
+      b.addEventListener('click', () => {
+        applyLang(b.dataset.lang);
+        langMenu.classList.add('hidden');
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!langMenu.contains(e.target) && !langBtn.contains(e.target)) {
+        langMenu.classList.add('hidden');
+      }
+    });
+
+    // initial language: localStorage → browser → en
+    (function init() {
+      let lang;
+      try { lang = localStorage.getItem('agora_lang'); } catch (e) {}
+      if (!lang) {
+        const browser = (navigator.language || 'en').slice(0, 2).toLowerCase();
+        if (I18N[browser]) lang = browser;
+      }
+      applyLang(lang || 'en');
+    })();
+  </script>
+
+</body>
+</html>
