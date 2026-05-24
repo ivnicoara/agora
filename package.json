@@ -1,0 +1,9 @@
+{
+  "name": "agora",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agora — direct democracy platform (static prototype)",
+  "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp index.html demo.html favicon.svg dist/"
+  }
+}
